@@ -1,0 +1,13 @@
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+
+data/
+uploads/resumes/*
+!uploads/resumes/.gitkeep
+
+README.md
+*.zip

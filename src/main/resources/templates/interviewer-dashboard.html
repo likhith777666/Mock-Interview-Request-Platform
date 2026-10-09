@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Interviewer Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav>
+    <div class="brand">Mock Interview Platform</div>
+    <div><a href="/">Home</a><a href="/requests/new">Candidate Request</a></div>
+</nav>
+
+<main class="container">
+    <div th:if="${success}" class="alert success" th:text="${success}"></div>
+
+    <h1>Interviewer Dashboard</h1>
+    <p class="muted">Demo dashboard without authentication. A production version should add interviewer login/authorization.</p>
+
+    <section class="card">
+        <h2>Requests</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Request</th><th>Candidate</th><th>Role</th><th>Status</th><th>Current Interviewer</th><th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${requests}">
+                <td><a th:href="@{'/requests/' + ${r.requestId}}" th:text="${r.requestId}"></a></td>
+                <td th:text="${r.candidateName}"></td>
+                <td th:text="${r.targetRole}"></td>
+                <td><span class="status" th:text="${r.status}"></span></td>
+                <td th:text="${r.interviewer != null ? r.interviewer.name : 'None'}"></td>
+                <td>
+                    <div class="inline-actions">
+                        <form th:each="i : ${allInterviewers}"
+                              th:if="${r.interviewer == null and r.status.name() != 'COMPLETED'}"
+                              th:action="@{'/interviewer/requests/' + ${r.id} + '/accept'}" method="post">
+                            <input type="hidden" name="interviewerId" th:value="${i.id}">
+                            <button class="small-button" type="submit"
+                                    th:text="'Accept as ' + ${i.name}"></button>
+                        </form>
+
+                        <form th:each="i : ${allInterviewers}"
+                              th:if="${r.interviewer != null and r.status.name() == 'PENDING' and r.interviewer.id == i.id}"
+                              th:action="@{'/interviewer/requests/' + ${r.id} + '/decline'}" method="post">
+                            <input type="hidden" name="interviewerId" th:value="${i.id}">
+                            <button class="small-button danger" type="submit">Decline</button>
+                        </form>
+
+                        <a class="small-button" th:if="${r.interviewer != null and r.status.name() == 'PENDING'}"
+                           th:href="@{'/requests/' + ${r.requestId} + '/confirm'}">Confirm</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card">
+        <h2>Available Interviewers</h2>
+        <div class="interviewer-grid">
+            <div class="interviewer" th:each="i : ${interviewers}">
+                <h3 th:text="${i.name}"></h3>
+                <p th:text="${i.role + ' • ' + i.experienceYears}"></p>
+                <p th:text="${#strings.listJoin(i.skills, ', ')}"></p>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

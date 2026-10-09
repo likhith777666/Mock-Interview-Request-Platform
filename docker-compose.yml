@@ -1,0 +1,77 @@
+services:
+
+  mysql:
+    image: mysql:8.4
+    container_name: mock-interview-mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: mock_interview
+      MYSQL_USER: mockuser
+      MYSQL_PASSWORD: mockpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-prootpassword"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - mock-interview-network
+
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: mock-interview-app
+    restart: unless-stopped
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+
+      DB_URL: jdbc:mysql://mysql:3306/mock_interview?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+      DB_USERNAME: mockuser
+
+      DB_PASSWORD: mockpassword
+
+      SERVER_PORT: 8006
+
+      APP_UPLOAD_DIR: /app/uploads/resumes
+
+    ports:
+      - "8006:8006"
+
+    volumes:
+      - app_uploads:/app/uploads
+
+    networks:
+      - mock-interview-network
+
+
+networks:
+  mock-interview-network:
+
+volumes:
+  mysql_data:
+  app_uploads:

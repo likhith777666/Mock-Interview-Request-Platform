@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Interview</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav><div class="brand">Mock Interview Platform</div><div><a href="/">Home</a></div></nav>
+
+<main class="container narrow">
+    <h1>Confirm Interview</h1>
+
+    <section class="card">
+        <p><strong>Candidate:</strong> <span th:text="${request.candidateName}"></span></p>
+        <p><strong>Interviewer:</strong> <span th:text="${request.interviewer.name}"></span></p>
+
+        <form th:action="@{'/requests/' + ${request.requestId} + '/confirm'}" th:object="${form}" method="post" class="form">
+            <label>Confirmed slot *</label>
+            <select th:field="*{confirmedSlot}" required>
+                <option value="">-- Select slot --</option>
+                <option th:each="slot : ${request.preferredSlots}"
+                        th:value="${#temporals.format(slot, 'yyyy-MM-dd''T''HH:mm')}"
+                        th:text="${#temporals.format(slot, 'dd MMM yyyy, hh:mm a')}"></option>
+            </select>
+            <div class="field-error" th:errors="*{confirmedSlot}"></div>
+
+            <label>Meeting link *</label>
+            <input type="url" th:field="*{meetingLink}" placeholder="https://meet.google.com/..." required>
+            <div class="field-error" th:errors="*{meetingLink}"></div>
+
+            <button class="button" type="submit">Confirm Interview</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

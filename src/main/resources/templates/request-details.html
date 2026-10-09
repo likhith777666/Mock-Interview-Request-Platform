@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav>
+    <div class="brand">Mock Interview Platform</div>
+    <div><a href="/">Home</a><a href="/requests/new">New Request</a><a href="/interviewer/dashboard">Interviewer Dashboard</a></div>
+</nav>
+
+<main class="container">
+    <div th:if="${success}" class="alert success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert error" th:text="${error}"></div>
+
+    <div class="page-header">
+        <div>
+            <h1 th:text="'Request ' + ${request.requestId}"></h1>
+            <span class="status" th:text="${request.status}"></span>
+        </div>
+        <a class="button secondary" href="/">Back</a>
+    </div>
+
+    <div class="grid two">
+        <section class="card">
+            <h2>Candidate</h2>
+            <p><strong>Name:</strong> <span th:text="${request.candidateName}"></span></p>
+            <p><strong>Email:</strong> <span th:text="${request.candidateEmail}"></span></p>
+            <p><strong>Role:</strong> <span th:text="${request.targetRole}"></span></p>
+            <p><strong>Experience:</strong> <span th:text="${request.experience}"></span></p>
+            <p><strong>Requirements:</strong> <span th:text="${request.interviewRequirements ?: 'Not provided'}"></span></p>
+            <p><strong>Resume:</strong> <span th:text="${request.resumeFileName}"></span></p>
+        </section>
+
+        <section class="card">
+            <h2>Preferred Slots</h2>
+            <ul>
+                <li th:each="slot : ${request.preferredSlots}"
+                    th:text="${#temporals.format(slot, 'dd MMM yyyy, hh:mm a')}"></li>
+            </ul>
+
+            <div th:if="${request.interviewer != null}">
+                <h3>Assigned Interviewer</h3>
+                <p th:text="${request.interviewer.name}"></p>
+                <p class="muted" th:text="${request.interviewer.email}"></p>
+            </div>
+
+            <div th:if="${request.confirmedSlot != null}">
+                <h3>Confirmed Interview</h3>
+                <p th:text="${#temporals.format(request.confirmedSlot, 'dd MMM yyyy, hh:mm a')}"></p>
+                <p><a th:href="${request.meetingLink}" target="_blank" th:text="${request.meetingLink}"></a></p>
+            </div>
+        </section>
+    </div>
+
+    <section class="card" th:if="${request.interviewer == null}">
+        <h2>Suitable Interviewers</h2>
+        <p class="muted">These interviewers are ranked using target role and requirement keywords.</p>
+        <div class="interviewer-grid">
+            <div class="interviewer" th:each="i : ${suitableInterviewers}">
+                <h3 th:text="${i.name}"></h3>
+                <p th:text="${i.role + ' • ' + i.experienceYears}"></p>
+                <p><strong>Skills:</strong> <span th:text="${#strings.listJoin(i.skills, ', ')}"></span></p>
+                <form th:action="@{'/requests/' + ${request.requestId} + '/select-interviewer'}" method="post">
+                    <input type="hidden" name="interviewerId" th:value="${i.id}">
+                    <button class="button" type="submit">Select</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="actions">
+        <!-- <a class="button" th:if="${request.interviewer != null and request.status.name() == 'PENDING'}"
+           th:href="@{'/requests/' + ${request.requestId} + '/confirm'}">Confirm Interview</a> -->
+
+        <form th:if="${request.status.name() == 'CONFIRMED'}"
+              th:action="@{'/requests/' + ${request.requestId} + '/complete'}" method="post">
+            <button class="button success-btn" type="submit">Mark Completed</button>
+        </form>
+
+        <a class="button secondary" th:if="${request.interviewer == null}"
+           th:href="@{'/requests/' + ${request.requestId} + '/select-interviewer'}">Choose Interviewer</a>
+    </section>
+</main>
+</body>
+</html>

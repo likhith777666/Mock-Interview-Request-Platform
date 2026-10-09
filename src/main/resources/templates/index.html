@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mock Interview Platform</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav>
+    <div class="brand">Mock Interview Platform</div>
+    <div>
+        <a href="/">Home</a>
+        <a href="/requests/new">Request Interview</a>
+        <a href="/interviewer/dashboard">Interviewer Dashboard</a>
+    </div>
+</nav>
+
+<main class="container">
+    <section class="hero">
+        <h1>Practice with a real interviewer</h1>
+        <p>Submit your profile, resume, interview requirements and preferred slots.</p>
+        <a class="button" href="/requests/new">Create Interview Request</a>
+    </section>
+
+    <div th:if="${success}" class="alert success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert error" th:text="${error}"></div>
+
+    <section>
+        <h2>Existing Requests</h2>
+        <div th:if="${#lists.isEmpty(requests)}" class="card">No requests yet.</div>
+        <table th:if="${!#lists.isEmpty(requests)}">
+            <thead>
+            <tr><th>Request ID</th><th>Candidate</th><th>Role</th><th>Status</th><th>Interviewer</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${requests}">
+                <td th:text="${r.requestId}"></td>
+                <td th:text="${r.candidateName}"></td>
+                <td th:text="${r.targetRole}"></td>
+                <td><span class="status" th:text="${r.status}"></span></td>
+                <td th:text="${r.interviewer != null ? r.interviewer.name : 'Not assigned'}"></td>
+                <td><a th:href="@{'/requests/' + ${r.requestId}}">View</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

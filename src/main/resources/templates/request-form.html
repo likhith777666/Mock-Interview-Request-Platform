@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Interview Request</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav>
+    <div class="brand">Mock Interview Platform</div>
+    <div><a href="/">Home</a><a href="/interviewer/dashboard">Interviewer Dashboard</a></div>
+</nav>
+
+<main class="container narrow">
+    <h1>Mock Interview Request</h1>
+    <p class="muted">Fill in your profile and preferred interview times.</p>
+
+    <form th:action="@{/requests}" th:object="${form}" method="post" enctype="multipart/form-data" class="card form">
+        <label>Candidate name *</label>
+        <input type="text" th:field="*{candidateName}" required>
+        <div class="field-error" th:errors="*{candidateName}"></div>
+
+        <label>Email *</label>
+        <input type="email" th:field="*{candidateEmail}" required>
+        <div class="field-error" th:errors="*{candidateEmail}"></div>
+
+        <label>Target role *</label>
+        <input type="text" th:field="*{targetRole}" placeholder="e.g. DevOps Engineer" required>
+        <div class="field-error" th:errors="*{targetRole}"></div>
+
+        <label>Experience *</label>
+        <input type="text" th:field="*{experience}" placeholder="e.g. 2 years" required>
+        <div class="field-error" th:errors="*{experience}"></div>
+
+        <label>Interview requirements</label>
+        <textarea th:field="*{interviewRequirements}" rows="5"
+                  placeholder="Topics, interview type, difficulty, tools, etc."></textarea>
+
+        <label>Resume * (PDF, DOC, DOCX; max 5 MB)</label>
+        <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+
+        <h3>Preferred interview slots</h3>
+
+        <label>Slot 1 *</label>
+        <input type="datetime-local" th:field="*{slot1}" required>
+
+        <label>Slot 2</label>
+        <input type="datetime-local" th:field="*{slot2}">
+
+        <label>Slot 3</label>
+        <input type="datetime-local" th:field="*{slot3}">
+
+        <button class="button" type="submit">Submit Request</button>
+    </form>
+</main>
+</body>
+</html>
